@@ -22,6 +22,9 @@ const createUrl = async (req, res) => {
         if (!validUrl.isUri(longUrl)) return res.status(400).send({ status: false, message: `This (${longUrl}) longUrl is not valid ` })
 
         let shorterUrl = shortid.generate(longUrl)
+        console.log(shorterUrl)
+
+        
 
         res.status(201).send({status: true, data : shorterUrl})
 
