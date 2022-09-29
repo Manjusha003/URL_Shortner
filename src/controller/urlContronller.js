@@ -5,7 +5,7 @@ const shortid = require("shortid")
 
 function isUrlValid(userInput) {
     var res = userInput.match(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/);
-    if(res == null)
+    if (res == null)
         return false;
     else
         return true;
@@ -28,7 +28,7 @@ const createUrl = async (req, res) => {
 
         if (!validUrl.isUri(longUrl)) return res.status(400).send({ status: false, message: `This longUrl value is not valid. (${longUrl})  ` })
 
-        if(!isUrlValid(longUrl)) return res.status(400).send({ status: false, message: `This (${longUrl}) longUrl is not valid  should be in lowercase` })
+        if (!isUrlValid(longUrl)) return res.status(400).send({ status: false, message: `This (${longUrl}) longUrl is not valid  should be in lowercase` })
 
         let urlFind = await urlModel.findOne({ longUrl: longUrl })
 
@@ -48,25 +48,26 @@ const createUrl = async (req, res) => {
 
     } catch (err) {
         console.log(err)
-        res.status(500).send({ status: false, error: err })
+        res.status(500).send({ status: false, error: err.message })
     }
 }
 
 
 
-const getUrl = async function (req, res){
-     try{
+const getUrl = async function (req, res) {
+    try {
         let param = req.params.urlCode
         console.log(param)
-     if(!param) return res.status(400).send({status:false, message:"Please enter urlCode in path param"})
+        if (!param) return res.status(400).send({ status: false, message: "Please enter urlCode in path param" })
 
-     let findUrl = await urlModel.findOne({urlCode:param})
-     console.log(findUrl)
-     if(!findUrl) return res.status(404).send({status:false, message:"No url found with this urlCode"})
-     return res.status(302).redirect({status:true, message:"Url found", data:findUrl.longUrl})   
+        let findUrl = await urlModel.findOne({ urlCode: param })
+
+        if (findUrl==null) return res.status(404).send({ status: false, message: `No url found with this ${param}` })
+
+        res.status(302).redirect(findUrl.longUrl)
     }
-    catch(err){ return res.status(500).send({ status: false, error: err })}
+    catch (err) { return res.status(500).send({ status: false, error: err.message }) }
 }
 
 
-module.exports = { createUrl ,getUrl}
+module.exports = { createUrl, getUrl }
