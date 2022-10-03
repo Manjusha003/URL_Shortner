@@ -11,14 +11,22 @@ mongoose.connect('mongodb+srv://Salman:g0Yrkp0tTQ2sVPBP@cluster0.eekagxa.mongodb
     useNewUrlParser:true
 })
 .then(() => console.log("Mongodb is connected"))
-.catch(err => console.log("Error",err)) 
+.catch(err => console.log("Error",err.message)) 
+
+app.use(
+    function (req, res, next) {
+        let time = Date.now()/1000
+        console.log(`time : ${time} , url : ${req.url} `);
+        next();
+    }
+);
 
 app.use('/',route)
+// app.use('/*',function(req,res){
+//     return res.status(404).send({staus:false, message:"Path not found(Invalid Url)"})
+// })
 
-app.listen(process.env.PORT || 3000,function(){
-    console.log("Express app running on port"+ (process.env.PORT|| 3000) )
+app.listen(process.env.PORT || 3000,function(){                                
+    console.log("Express app running on port "+ (process.env.PORT|| 3000) )
 })
 
-app.use('/*',function(req,res){
-    return res.status(404).send({staus:false, message:"Path not found(Invalid Url)"})
-})
