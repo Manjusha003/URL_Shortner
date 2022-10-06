@@ -137,7 +137,9 @@ const getUrl = async function (req, res) {
 
     let cacheUrlData = await GET_ASYNC(`${param}`);
     cacheUrlData = JSON.parse(cacheUrlData);
-    console.log("Data from radis",cacheUrlData)
+    if(cacheUrlData) console.log("Data from radis",cacheUrlData)
+    else console.log("No data in cache/Radis for this shortUrl")
+    
     if (cacheUrlData) return res.status(302).redirect(cacheUrlData)
 
     let findUrl = await urlModel.findOne({ urlCode: param }).select({ longUrl: 1, _id: 0 })
