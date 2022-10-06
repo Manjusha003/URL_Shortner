@@ -70,23 +70,29 @@ const createUrl = async (req, res) => {
 
     if (Object.keys(rest).length > 0) return res.status(400).send({ status: false, message: `This {${Object.keys(rest)}} field is not required` })
 
-    // if (typeof longUrl != "string" || longUrl.trim() == "") return res.status(400).send({ status: false, message: `longUrl will in string only.` })
+    if (typeof longUrl != "string" || longUrl.trim() == "") return res.status(400).send({ status: false, message: `longUrl will in string only.` })
 
     if (!regexUrl.test(longUrl.trim()) || !validUrl.isWebUri(longUrl)) return res.status(400).send({ status: false, message: `This longUrl is not valid. (${longUrl})  ` })
 
     // <<--------- Get DAta from the Cache Memory ---------->>
 
-    let cahcelongUrl = await GET_ASYNC(`${longUrl}`);
-    console.log("redis data");
+    let cachelongUrl = await GET_ASYNC(`${longUrl}`);
 
-    if (cahcelongUrl) return res.status(200).send({status: true, message: "Data from Redis", data: JSON.parse(cahcelongUrl),});
-    
+
+    if (cachelongUrl) {
+      console.log("<-----------------------------------Data from radis------------------------------------->");
+      console.log(cachelongUrl)
+      return res.status(200).send({ status: true, message: "Data from Redis", data: JSON.parse(cachelongUrl), });
+    }
 
     //<----------------------------checking for url in Database----------------------->
     let urlFind = await urlModel.findOne({ longUrl: longUrl }).select({ createdAt: 0, updatedAt: 0, __v: 0, _id: 0 });
 
     if (urlFind) {
       await SET_ASYNC(`${longUrl}`, JSON.stringify(urlFind), "EX", timeLimit)
+
+      console.log("<-----------------------------------Data from mongoDb------------------------------------->");
+      console.log(urlFind)
       return res.status(200).send({ status: true, message: "data from mongoDb Database", data: urlFind });
     }
 
@@ -108,16 +114,14 @@ const createUrl = async (req, res) => {
 
     await SET_ASYNC(`${longUrl}`, JSON.stringify(newData), "EX", timeLimit);
     // await SET_ASYNC(`${shortUrl}`, JSON.stringify(longUrl));
+    console.log("<-----------------------------------Data from mongoDb------------------------------------->");
+    console.log(urlSave)
 
-    return res.status(201).send({
-      status: true,
-      message: "data create in mongoDb server and set to redis",
-      data: newData,
-    });
+    return res.status(201).send({ status: true, message: "data create in mongoDb server and set to redis", data: newData });
 
 
   } catch (err) {
-    console.log(err)
+    console.log(err.message)
     res.status(500).send({ status: false, error: err.message })
   }
 }
@@ -135,22 +139,25 @@ const getUrl = async function (req, res) {
 
     let cacheUrlData = await GET_ASYNC(`${param}`);
     cacheUrlData = JSON.parse(cacheUrlData);
-    if(cacheUrlData) console.log("Data from radis",cacheUrlData)
-    else console.log("No data in cache/Radis for this shortUrl")
-    
+    if (cacheUrlData) {
+      console.log("<-----------------------------------Data from radis------------------------------------->")
+      console.log(cacheUrlData)
+    }
+    else console.log(`No data in cache/Radis for this (${param}) shortUrl`)
+
     if (cacheUrlData) return res.status(302).redirect(cacheUrlData)
 
     //<<-------------------------- Get Data From Cache Memory ------------------------------->>
 
     let findUrl = await urlModel.findOne({ urlCode: param }).select({ longUrl: 1, _id: 0 })
-    console.log(findUrl.longUrl)
-    
-   if(!findUrl) return res.status(400).send({status:false,message:"This short url is not exixt in the db"})
 
-    if (findUrl == null)
-      return res.status(404).send({ status: false, message: `No url found with this ${param}` })
+    if (!findUrl) return res.status(400).send({ status: false, message: "This short url is not exixt in the db" })
+
+    if (findUrl == null) return res.status(404).send({ status: false, message: `No url found with this ${param}` })
 
     if (findUrl) {
+      console.log("<-----------------------------------Data from Mongodb------------------------------------->")
+      console.log(findUrl.longUrl)
       await SET_ASYNC(`${param}`, JSON.stringify(findUrl.longUrl), "EX", timeLimit)
       return res.status(302).redirect(findUrl.longUrl)
     }
