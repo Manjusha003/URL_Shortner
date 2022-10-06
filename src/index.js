@@ -15,7 +15,7 @@ mongoose.connect('mongodb+srv://Salman:g0Yrkp0tTQ2sVPBP@cluster0.eekagxa.mongodb
 
 app.use(
     function (req, res, next) {
-        let time = Date.now()/1000
+        let time = Date.now()
         console.log(`time : ${time} , url : ${req.url} `);
         next();
     }

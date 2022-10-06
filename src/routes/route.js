@@ -4,7 +4,7 @@ const {createUrl,getUrl} = require("../controller/urlContronller")
 
 
 
-router.get("/test",(req,res)=> res.send({msg:"I am working"}))
+router.get("/test",(req,res)=> res.status(200).send({status:true, msg:"I am working"}))
 
 //<--------------------URL API's---------------------------->
 router.post("/url/shorten", createUrl)
