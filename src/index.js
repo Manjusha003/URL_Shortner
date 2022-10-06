@@ -22,9 +22,10 @@ app.use(
 );
 
 app.use('/',route)
-// app.use('/*',function(req,res){
-//     return res.status(404).send({staus:false, message:"Path not found(Invalid Url)"})
-// })
+
+app.use('/*',function(req,res){
+    return res.status(404).send({staus:false, message:"Path not found(Invalid Url)"})
+})
 
 app.listen(process.env.PORT || 3000,function(){                                
     console.log("Express app running on port "+ (process.env.PORT|| 3000) )
