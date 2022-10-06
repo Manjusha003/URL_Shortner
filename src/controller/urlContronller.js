@@ -79,13 +79,8 @@ const createUrl = async (req, res) => {
     let cahcelongUrl = await GET_ASYNC(`${longUrl}`);
     console.log("redis data");
 
-    if (cahcelongUrl) {
-      return res.status(200).send({
-        status: true,
-        message: "Data from Redis",
-        data: JSON.parse(cahcelongUrl),
-      });
-    }
+    if (cahcelongUrl) return res.status(200).send({status: true, message: "Data from Redis", data: JSON.parse(cahcelongUrl),});
+    
 
     //<----------------------------checking for url in Database----------------------->
     let urlFind = await urlModel.findOne({ longUrl: longUrl }).select({ createdAt: 0, updatedAt: 0, __v: 0, _id: 0 });
@@ -107,8 +102,8 @@ const createUrl = async (req, res) => {
       longUrl: urlSave.longUrl,
       urlCode: urlSave.urlCode,
       shortUrl: urlSave.shortUrl,
-
     };
+    
     //<<---------------Set Data in Chache Memory Server-------->>
 
     await SET_ASYNC(`${longUrl}`, JSON.stringify(newData), "EX", timeLimit);
