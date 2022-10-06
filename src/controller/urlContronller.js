@@ -6,7 +6,7 @@ const shortid = require("shortid")
 const redis = require("redis");
 const { promisify } = require("util");
 const baseUrl = "http://localhost:3000";
-const timeLimit = 2 * 60;
+const timeLimit = 20 * 60; //after 20 min cache data will clear automatically.
 
 //-------------------------------- GLobal Validation Defined--------------------------------//
 
