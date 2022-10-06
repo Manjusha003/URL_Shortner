@@ -133,6 +133,8 @@ const getUrl = async function (req, res) {
 
     if (!shortid.isValid(param)) return res.status(400).send({ status: false, massage: "Enter valid shortid!!!! " });
 
+   let checkShortUrl=await urlModel.findOne({urlCode:param})
+   if(!checkShortUrl) return res.status(400).send({status:false,message:"This short url is not exixt in the db"})
     //<<-------------------------- Get Data From Cache Memory ------------------------------->>
 
     let cacheUrlData = await GET_ASYNC(`${param}`);
