@@ -39,6 +39,7 @@ redisClient.auth("MxfQxTtqnI6TQeXdgYxM97XgDVeZPBn9", function (err) {
 //------ Connect to the Server---------------->>
 
 redisClient.on("connect", async function (err) {
+  if (err) throw err;
   console.log("Connected to Redis!");
 });
 
@@ -142,10 +143,9 @@ const getUrl = async function (req, res) {
     if (cacheUrlData) {
       console.log("<-----------------------------------Data from radis------------------------------------->")
       console.log(cacheUrlData)
+      return res.status(302).redirect(cacheUrlData)
     }
     else console.log(`No data in cache/Radis for this (${param}) shortUrl`)
-
-    if (cacheUrlData) return res.status(302).redirect(cacheUrlData)
 
     //<<-------------------------- Get Data From Cache Memory ------------------------------->>
 
